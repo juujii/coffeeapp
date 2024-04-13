@@ -21,7 +21,7 @@ def find_string(url, target_string):
         print(f"Could not find '{target_string}' on the page")
         return None
 
-def get_producer():
+def get_coffee_details():
     url = "https://assemblycoffee.co.uk/pages/subscription-the-flavour-index"
     target_strings = ['Producers —', 'Region —', 'Altitude —', 'Variety —', 'Process —' ]
     coffee_dict = {}
@@ -30,4 +30,4 @@ def get_producer():
         coffee_dict[i[:-2]] = match.group(0)
     print(coffee_dict)
 
-get_producer()
+get_coffee_details()
