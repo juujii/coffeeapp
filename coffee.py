@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import unicodedata
+import re
 
 def find_string(url, target_string):
     # Fetch HTML content
@@ -24,7 +26,8 @@ def get_producer():
     target_strings = ['Producers —', 'Region —', 'Altitude —', 'Variety —', 'Process —' ]
     coffee_dict = {}
     for i in target_strings:
-        print((find_string(url, i)))
+        match = re.search ("(?<=— ).*", unicodedata.normalize("NFKD", find_string(url, i)))
+        coffee_dict[i[:-2]] = match.group(0)
     print(coffee_dict)
 
 get_producer()
