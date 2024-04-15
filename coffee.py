@@ -1,7 +1,21 @@
-import requests
-from bs4 import BeautifulSoup
+import json
 import unicodedata
+from bs4 import BeautifulSoup
+import requests
 import re
+import os
+import datetime
+from datetime import datetime
+
+
+
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
+DATABASE_ID = os.environ.get("NOTION_DATABASE_ID") 
+headers = {
+    "Authorization": "Bearer " + NOTION_TOKEN,
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28",  
+}
 
 def find_string(url, target_string):
     # Fetch HTML content
@@ -28,6 +42,26 @@ def get_coffee_details():
     for i in target_strings:
         match = re.search ("(?<=— ).*", unicodedata.normalize("NFKD", find_string(url, i)))
         coffee_dict[i[:-2]] = match.group(0)
-    print(coffee_dict)
+    return coffee_dict
 
-get_coffee_details()
+def create_page():
+    coffee_dict = get_coffee_details()
+    data = {
+    "Producer": {"title": [{"text": {"content": coffee_dict["Producers"]}}]},
+    "Region": {"rich_text": [{"text": {"content": coffee_dict["Region"]}}]},
+    "Altitude": {"rich_text": [{"text": {"content": coffee_dict["Altitude"]}}]},
+    "Variety": {"rich_text": [{"text": {"content": coffee_dict["Variety"]}}]},
+    "Process": {"rich_text": [{"text": {"content": coffee_dict["Process"]}}]},
+    "Month": {"rich_text": [{"text": {"content": datetime.now().strftime("%B")}}]}
+    }
+    create_url = "https://api.notion.com/v1/pages"
+    payload = {"parent": {"database_id": DATABASE_ID}, "properties": data}
+    res = requests.post(create_url, headers=headers, json=payload)
+    return res
+
+create_page()
+
+
+
+
+
