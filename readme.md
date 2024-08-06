@@ -25,4 +25,4 @@ The application requires you set the following environment variables:
 
 ## Automation ##
 
-I use AWS Lambda coupled with EventBridge Scheduler to automate the execution of this each month. You'll need to make some small amendments to the code to include it in the default Lambda function, as well as ensure the environment variables are stored. I might make a post on this later. 
+I use AWS Lambda coupled with EventBridge Scheduler to automate the execution of this each month. You'll need to make some small amendments to the code to include it in the default Lambda function, as well as ensure the environment variables are stored in Lambda. I might make a post on this later. 
