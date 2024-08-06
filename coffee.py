@@ -7,8 +7,7 @@ import os
 import datetime
 from datetime import datetime
 
-
-
+# Set Notion credentials using environment variables
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 DATABASE_ID = os.environ.get("NOTION_DATABASE_ID") 
 headers = {
@@ -17,13 +16,13 @@ headers = {
     "Notion-Version": "2022-06-28",  
 }
 
+# Fetch the HTML content
 def find_string(url, target_string):
-    # Fetch HTML content
     response = requests.get(url)
     if response.status_code != 200:
         print("Failed to fetch the page")
         return None
-
+    
     # Parse HTML content
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -35,19 +34,21 @@ def find_string(url, target_string):
         print(f"Could not find '{target_string}' on the page")
         return None
 
+# Get the interesting coffee information 
 def get_coffee_details():
     url = "https://assemblycoffee.co.uk/pages/subscription-the-flavour-index"
-    target_strings = ['Producers —', 'Region —', 'Altitude —', 'Variety —', 'Process —' ]
+    target_strings = ['Producer —', 'Region —', 'Altitude —', 'Variety —', 'Process —' ]
     coffee_dict = {}
     for i in target_strings:
         match = re.search ("(?<=— ).*", unicodedata.normalize("NFKD", find_string(url, i)))
         coffee_dict[i[:-2]] = match.group(0)
     return coffee_dict
 
+# Append an entry to the notion database 
 def create_page():
     coffee_dict = get_coffee_details()
     data = {
-    "Producer": {"title": [{"text": {"content": coffee_dict["Producers"]}}]},
+    "Producer": {"title": [{"text": {"content": coffee_dict["Producer"]}}]},
     "Region": {"rich_text": [{"text": {"content": coffee_dict["Region"]}}]},
     "Altitude": {"rich_text": [{"text": {"content": coffee_dict["Altitude"]}}]},
     "Variety": {"rich_text": [{"text": {"content": coffee_dict["Variety"]}}]},
@@ -59,6 +60,7 @@ def create_page():
     res = requests.post(create_url, headers=headers, json=payload)
     return res
 
+# Call the fuction
 create_page()
 
 
