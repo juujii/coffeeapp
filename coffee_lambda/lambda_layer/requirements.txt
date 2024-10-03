@@ -1,0 +1,4 @@
+requests
+openai
+notion_client
+exceptiongroup

@@ -13,8 +13,7 @@ DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 ses_client = boto3.client('ses', region_name='eu-west-2')
 sender_email = os.environ.get("SENDER_EMAIL")
-recipient_email_1 = os.environ.get("RECIPIENT_EMAIL_1")
-recipient_email_2 = os.environ.get("RECIPIENT_EMAIL_2")
+recipient_email = os.environ.get("RECIPIENT_EMAIL")
 
 # Error handling for environment variables
 if not NOTION_TOKEN:
@@ -30,7 +29,7 @@ if not OPENAI_API_KEY:
 client = OpenAI(api_key=OPENAI_API_KEY)
 notion = Client(auth=NOTION_TOKEN)
 
-# Fetch the HTML content and craft prompt
+# Fetch the HTML content from the URL
 def get_html_content(url):
 	try:
 		response = requests.get(url)
@@ -39,6 +38,8 @@ def get_html_content(url):
 	except requests.exceptions.RequestException as e:
 		print(f"FAILURE: Error fetching the URL: {e}")
 		exit(1)
+
+# Define the prompt with the HTML content
 
 # Send the request to the OpenAI API
 def get_coffee_info():
@@ -75,15 +76,11 @@ def publish_to_notion(database_id):
 		}
 	}
 	try:
-		# Add the data to the Notion database
 		notion.pages.create(**notion_data)
-		print("SUCCESS: Data added to Notion database.")
-		# Send the email
 		ses_client.send_email(
 			Destination={
 				'ToAddresses': [
-					recipient_email_1,
-					recipient_email_2
+					recipient_email
 				],
 			},
 			Message={
@@ -97,12 +94,13 @@ def publish_to_notion(database_id):
 							<p><strong>Name:</strong> {coffee_info.get('name', 'N/A')}</p>
 							<p><strong>Producer:</strong> {coffee_info.get('producer', 'N/A')}</p>
 							<p><strong>Country:</strong> {coffee_info.get('country', 'N/A')}</p>
-							<p><strong>Region:</strong> {coffee_info.get('region', 'N/A')}</p>
 							<p><strong>Farm:</strong> {coffee_info.get('farm', 'N/A')}</p>
+							<p><strong>Region:</strong> {coffee_info.get('region', 'N/A')}</p>
 							<p><strong>Variety:</strong> {coffee_info.get('variety', 'N/A')}</p>
 							<p><strong>Terroir:</strong> {coffee_info.get('terroir', 'N/A')}</p>
 							<p><strong>Process:</strong> {coffee_info.get('process', 'N/A')}</p>
 							<p>{coffee_info.get('fact', 'N/A')}</p>
+							<p>Thanks from jujico</p>
 						</body>
 						</html>
 						"""
@@ -115,10 +113,14 @@ def publish_to_notion(database_id):
 			},
 			Source=sender_email
 		)
-		print("SUCCESS: Email sent.")
+		print("SUCCESS: Data added to Notion database.")
 	except Exception as e:
 		print(f"FAILURE: Error adding data to Notion: {e}")
 		exit(1)
         
 # Call the function
-publish_to_notion(DATABASE_ID)
+def lambda_handler(event, context):
+    publish_to_notion(DATABASE_ID)
+
+
+
