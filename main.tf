@@ -55,8 +55,7 @@ resource "aws_lambda_function" "coffee_lambda_function" {
       NOTION_DATABASE_ID = var.NOTION_DATABASE_ID,
       OPENAI_API_KEY     = var.OPENAI_API_KEY,
       SENDER_EMAIL       = var.SENDER_EMAIL,
-      RECIPIENT_EMAIL_1    = var.RECIPIENT_EMAIL_1
-      RECIPIENT_EMAIL_2    = var.RECIPIENT_EMAIL_2
+      RECIPIENT_EMAIL    = var.RECIPIENT_EMAIL
     }
   }
 }

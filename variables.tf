@@ -22,15 +22,10 @@ variable "SENDER_EMAIL" {
   sensitive   = true
 }
 
-variable "RECIPIENT_EMAIL_1" {
+variable "RECIPIENT_EMAIL" {
   description = "Email address of the recipient"
   type        = string
   sensitive   = true
 }
 
-variable "RECIPIENT_EMAIL_2" {
-  description = "Email address of the recipient"
-  type        = string
-  sensitive   = true
-}
 
